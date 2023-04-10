@@ -1,0 +1,812 @@
+import java.util.*;
+class AddCustormer{
+	private String custormerId;
+	private String custormerName;
+	public AddCustormer(){
+	}
+	public AddCustormer(String custormerId, String custormerName){
+	this.custormerId=custormerId;
+	this.custormerName=custormerName;
+	}
+	public boolean equals(String custormerId){
+		return custormerId.equals(this.custormerId);
+	}
+	public String getCustormerName(){
+		return custormerName;
+	}
+}
+class Order{
+	private String orderId;
+	private String custormerId;
+	private int quantity; 
+	private int status;
+	public static final int CANCEL=0;
+	public static final int PPREPARING=1;
+	public static final int DELIVERED=2;
+	 
+	public Order(String orderId,String custormerId,int quantity,int status){
+		this.orderId=orderId;
+		this.custormerId=custormerId;
+		this.quantity=quantity;
+		this.status=status;
+	}
+	public String getOrderId(){
+		return orderId;
+	}
+	public String getCustormerId(){
+		return custormerId;
+	}
+	public int getQuantity(){
+		return quantity;
+	}
+	public int getStatus(){
+		return status;
+	}
+	public boolean equals(String orderId){
+		return orderId.equals(this.orderId);
+	}
+	public boolean equalsci(String custormerId){
+		return custormerId.equals(this.custormerId);
+	}
+	public void setQuantity(int quantity){
+		this.quantity=quantity;
+	}
+	public void setStatus(int status){
+		this.status=status;
+	}
+}
+class Ihungryburgershop{
+	public static AddCustormer[] custormerArray=new AddCustormer[0];
+	public static Order [] orderArray=new Order[0];
+	public final static double BURGERPRICE=500;
+	public static void main(String args []){
+		Scanner input=new Scanner(System.in); 
+		homePage();
+		do{
+			clearConsole();
+			homePage();
+			System.out.print("Enter an option to continue > ");
+		    int x=input.nextInt();
+			switch(x){
+			case 1 : addNewCustormer();break;
+			case 2 : placeOrder();break;
+			case 3 : searchBestCustormer();break;
+			case 4 : searchOrders();break;
+			case 5 : searchCustormer();break;
+			case 6 : viewOrders();break;
+			case 7 : updateOrderDetails();break;
+			case 8 : return;
+			}
+		}while(true);
+	}
+	public static void addNewCustormer(){
+		clearConsole();
+		Scanner input=new Scanner(System.in);
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println("|                              Add New Custormer                               |");
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println();
+		String custormerId;
+		L1:do{
+			System.out.print("Enter custormer Id(Phone Number)  > ");
+			custormerId=input.next();
+			if(!(checkId(custormerId))){
+				System.out.println("          Invalid format...");
+				L2:do{
+					System.out.print( "Do you want to add correct Cutormer Id(Y/N) ?");
+					char option =input.next().charAt(0);
+					System.out.println();
+					if(option=='Y'||option=='y'){
+					continue L1;
+					}else if(option=='N'||option=='n'){
+						return;
+					}else{
+						System.out.println("          Wrong input...");
+						continue L2;
+					}
+				}while(true);
+			}else{
+				if(searchCustormerId(custormerId)==-1){
+					System.out.print("Enter custormer name              > ");
+					String custormerName=input.next(); 
+					AddCustormer[] temp=new AddCustormer[custormerArray.length+1];
+					for(int i=0;i<custormerArray.length;i++){
+						temp[i]=custormerArray[i];
+					}
+					custormerArray=temp;
+					AddCustormer addcustormer=new AddCustormer(custormerId,custormerName);
+					custormerArray[custormerArray.length-1]=addcustormer;
+					System.out.println("          Custormer added succesfully...");
+					L2:do{
+						System.out.print( "Do you want to add another Cutormer(Y/N) ?");
+						char option =input.next().charAt(0);
+						System.out.println();
+						if(option=='Y'||option=='y'){
+						continue L1;
+						}else if(option=='N'||option=='n'){
+							return;
+						}else{
+							System.out.println("          Wrong input...");
+							continue L2;
+						}
+					}while(true);
+				}else{
+					System.out.println("          Custormer id already exist...");
+					L2:do{
+						System.out.print( "Do you want to add another Cutormer(Y/N) ?");
+						char option =input.next().charAt(0);
+						System.out.println();
+						if(option=='Y'||option=='y'){
+						continue L1;
+						}else if(option=='N'||option=='n'){
+							return;
+						}else{
+							System.out.println("          Wrong input...");
+							continue L2;
+						}
+					}while(true);
+				}
+			}
+		 }while (true);	
+	}
+	public static boolean checkId(String custormerId){
+		if(custormerId.length()==10&&custormerId.charAt(0)=='0'){
+			String lastDigits=custormerId.substring(1);
+			char[] lastDigitsArray=lastDigits.toCharArray();
+			for(char ch: lastDigitsArray){
+				if(!(ch<=58&&ch>=48)){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	public static int searchCustormerId(String custormerId){
+		for(int i=0;i<custormerArray.length;i++){
+			if(custormerArray[i].equals(custormerId)){
+				return i;
+			}
+		}
+		return -1;
+	}
+	public static void placeOrder(){
+		Scanner input=new Scanner(System.in);
+		clearConsole();
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println("|                                Place Order                                   |");
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println();
+		System.out.println(); 
+		L1:do{  
+				String orderId=generateOrderId();
+				System.out.println("ORDER ID - "+orderId);
+				System.out.println("================");
+				System.out.println();
+				System.out.print("Enter custormer Id(Phone Number)  > ");
+				String custormerId=input.next();
+				if(!(checkId(custormerId))){
+				System.out.println("          Invalid format...");
+				L2:do{
+					System.out.print( "Do you want to add correct Cutormer Id(Y/N) ?");
+					char option =input.next().charAt(0);
+					System.out.println();
+					if(option=='Y'||option=='y'){
+					clearConsole();
+					continue L1;
+					}else if(option=='N'||option=='n'){
+						return;
+					}else{
+						System.out.println("          Wrong input...");
+						continue L2;
+					}
+				}while(true);
+			}else{
+				if(searchCustormerId(custormerId)==-1){
+					System.out.println("         Custormer id does not exist...");
+					L2:do{
+							System.out.print( "Do you want to add another order(Y/N) ?");
+							char option =input.next().charAt(0);
+							System.out.println();
+							if(option=='Y'||option=='y'){
+								continue L1;
+							}else if(option=='N'||option=='n'){
+							return;
+							}else{
+								System.out.println("          Wrong input...");
+								continue L2;
+							}
+						}while(true);	
+				}else{
+					int i=searchCustormerId(custormerId);
+					String custormerName=custormerArray[i].getCustormerName();
+					System.out.println("Custormer Name - "+custormerName);
+					System.out.print("Enter Burger Quantity - ");
+					int quantity=input.nextInt();
+					double price=quantity*BURGERPRICE;
+					int status=1;
+					System.out.println("Total value - "+price+"0");
+					System.out.println();
+					System.out.print("Are you confirm order (Y/N) ? ");
+					char ch=input.next().charAt(0);
+					if(ch=='Y'||ch=='y'){
+						Order[] temp=new Order[orderArray.length+1];
+						for(int j=0;j<orderArray.length;j++){
+							temp[j]=orderArray[j];
+						}
+						orderArray=temp;
+						Order order=new Order(orderId,custormerId,quantity, status);
+						orderArray[orderArray.length-1]=order;
+						System.out.println(          "Your order successfully added....");
+						L2:do{
+								System.out.print( "Do you want to add another order(Y/N) ?");
+								char option =input.next().charAt(0);
+								System.out.println();
+								if(option=='Y'||option=='y'){
+									continue L1;
+								}else if(option=='N'||option=='n'){
+									return;
+								}else{
+										System.out.println("          Wrong input...");
+										continue L2;
+								}
+							}while(true);
+						}else if(ch=='N'||ch=='n'){
+							L2:do{
+								System.out.print( "Do you want to add another order(Y/N) ?");
+								char option =input.next().charAt(0);
+								System.out.println();
+								if(option=='Y'||option=='y'){
+									continue L1;
+								}else if(option=='N'||option=='n'){
+									return;
+								}else{
+									System.out.println("          Wrong input...");
+									continue L2;
+								}
+							}while(true);
+						}else{
+								System.out.println("          Wrong input...");
+								L2:do{
+									System.out.print( "Do you want to add another order(Y/N) ?");
+									char option =input.next().charAt(0);
+									System.out.println();
+									if(option=='Y'||option=='y'){
+										continue L1;
+									}else if(option=='N'||option=='n'){
+										return;
+									}else{
+										System.out.println("          Wrong input...");
+										continue L2;
+									}
+								}while(true);	
+							 }
+					}
+			}
+		 }while(true);
+	}
+	public static String generateOrderId(){
+		if(orderArray.length==0){
+				return "B0001";
+		}else{
+		String lastOrderId=orderArray[orderArray.length-1].getOrderId();
+		String lastDigits=lastOrderId.substring(1);
+		int lastOrderIdNumber=Integer.parseInt(lastDigits);
+		lastOrderIdNumber++;
+		String nextOrderId=String.format("B%04d",lastOrderIdNumber);
+		return nextOrderId;
+		}
+	}
+	public static void searchBestCustormer(){
+			Scanner input=new Scanner(System.in);
+			System.out.println("--------------------------------------------------------------------------------");
+			System.out.println("|                           Search Best Custormer                              |");
+			System.out.println("--------------------------------------------------------------------------------");
+			System.out.println();
+			System.out.println();
+			System.out.println("--------------------------------------------");
+			System.out.println("CustormerId       Name          Total");
+			System.out.println("--------------------------------------------");
+	}
+	public static void searchOrders(){
+		Scanner input=new Scanner(System.in);
+			clearConsole();
+			System.out.println("--------------------------------------------------------------------------------");
+			System.out.println("|                             Search Order Details                             |");
+			System.out.println("--------------------------------------------------------------------------------");
+			System.out.println();
+			L1:do{
+					System.out.print("Enter order Id  : ");
+					String orderId=input.next();
+					System.out.println();
+					if(searchOrderId(orderId)==-1){
+						L2:do{System.out.println("          Invalid Order Id... ");
+							System.out.print("Do you want to add another Order Id (Y/N) ? ");
+							char option=input.next().charAt(0);
+							if(option=='Y'||option=='y'){
+								continue L1;
+							}else if(option=='N'||option=='n'){
+								return;
+							}else{
+								System.out.print("          Wrong input...");
+								continue L2;
+							}
+					}while(true);
+						}else{
+							System.out.println();
+							System.out.println("------------------------------------------------------------------------------");
+							System.out.println(" OrderId    CustormerId    Name     Quantity      OrderValue     Order Status ");
+							System.out.println("------------------------------------------------------------------------------");
+							int i=searchOrderId(orderId);
+							int j=searchCustormerId(orderArray[i].getCustormerId());
+							String custormerName=custormerArray[j].getCustormerName();
+							int qty =orderArray[i].getQuantity();
+							double orderValue=qty*BURGERPRICE;
+							int x=orderArray[i].getStatus();
+							String status;
+							if(x==0){
+								status="Cancelled";
+							}else if(x==1){
+								status="Prepairing";
+							}else{
+								status="Dellivered";
+							}
+							
+							String fs=String.format(" %-11s%-15s%-13s%-8d%10.2f%18s",orderArray[i].getOrderId(),orderArray[i].getCustormerId(),custormerName,orderArray[i].getQuantity(),orderValue,status);
+							System.out.println(fs);
+							System.out.println();
+							System.out.println();
+							L2:do{
+								System.out.print("Do you want search another order detail (Y/N) ? ");
+								char option=input.next().charAt(0);
+								if(option=='Y'||option=='y'){
+									clearConsole();
+									System.out.println("--------------------------------------------------------------------------------");
+									System.out.println("|                             Search Order Details                             |");
+									System.out.println("--------------------------------------------------------------------------------");
+									System.out.println();
+									continue L1;
+								}else if(option=='N'||option=='n'){
+									return;
+								}else{
+									System.out.print("          Wrong input...");
+									continue L2;
+								}
+							}while(true);
+						}
+					
+				}while(true);
+	}
+	public static int searchOrderId(String orderId){
+		for(int i=0;i<orderArray.length;i++){
+			if(orderArray[i].equals(orderId)){
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public static void searchCustormer(){
+		clearConsole();
+		Scanner input=new Scanner(System.in);
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println("|                             Search Custormer                                 |");
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println();			
+		System.out.println();
+		L1:do{
+				System.out.print("Enter custormer Id > ");
+				String custormerId=input.next();
+				if(!(checkId(custormerId))){
+					System.out.println("          Invalid format...");
+					L2:do{
+						System.out.print( "Do you want to add correct Cutormer Id(Y/N) ?");
+						char option =input.next().charAt(0);
+						System.out.println();
+						if(option=='Y'||option=='y'){
+							continue L1;
+						}else if(option=='N'||option=='n'){
+							return;
+						}else{
+							System.out.println("          Wrong input...");
+							continue L2;
+						}
+					}while(true);
+				}else{
+						if(searchCustormerId(custormerId)==-1){
+							System.out.println("This customer id is not added yet...");
+							continue L1;
+						}else{	
+								int i=searchCustormerId(custormerId);
+								System.out.println();
+								System.out.println();
+								System.out.println("Custormer Id - "+custormerId);
+								String custormerName=custormerArray[i].getCustormerName();
+								System.out.println("Name         - "+custormerName);
+								System.out.println();
+								System.out.println("Custormer Order details");
+								System.out.println("=======================");
+								System.out.println();
+								System.out.println("--------------------------------------------");
+								System.out.println("Order Id      Order Quantity     Total Value");
+								System.out.println("--------------------------------------------");
+
+								for(int j=0;j<orderArray.length;j++){
+									if(orderArray[j].equalsci(custormerId)){
+										int qty=orderArray[j].getQuantity();
+										double tot=qty*BURGERPRICE;
+										String fs=String.format(" %-14s%-14d%12.2f",orderArray[j].getOrderId(),qty,tot);
+										System.out.println(fs);
+										System.out.println("--------------------------------------------");
+									}
+								}
+								System.out.println();
+								System.out.println();			
+								L2:do{
+										System.out.print( "Do you want tosearch another custormer detail (Y/N) ?");
+										char option =input.next().charAt(0);
+										System.out.println();
+										if(option=='Y'||option=='y'){
+											clearConsole();
+											System.out.println("--------------------------------------------------------------------------------");
+											System.out.println("|                             Search Custormer                                 |");
+											System.out.println("--------------------------------------------------------------------------------");
+											System.out.println();			
+											System.out.println();
+											continue L1;
+										}else if(option=='N'||option=='n'){
+											return;
+										}else{
+											System.out.println("          Wrong input...");
+											continue L2;
+										}
+									}while(true);
+						}
+				}
+			}while(true);
+	}
+	public static void viewOrders(){
+			Scanner input=new Scanner(System.in);
+			clearConsole();
+			System.out.println("--------------------------------------------------------------------------------");
+			System.out.println("|                                View Orders                                   |");
+			System.out.println("--------------------------------------------------------------------------------");
+			System.out.println();
+			System.out.println("[1] Deliverd order");
+			System.out.println("[2] Prepairing order");
+			System.out.println("[3] Cancel order");
+			System.out.println();
+			L1:do{System.out.print("Enter an option to continue : ");
+			char z=input.next().charAt(0);
+			if(z=='1'){
+				clearConsole();
+				System.out.println("--------------------------------------------------------------------------------");
+				System.out.println("|                              Deliverd Orders                                 |");
+				System.out.println("--------------------------------------------------------------------------------");
+				System.out.println();
+				System.out.println("---------------------------------------------------------------");
+				System.out.println(" OrderId    CustormerId    Name     Quantity      OrderValue   ");
+				System.out.println("---------------------------------------------------------------");
+				for(int i=0;i<orderArray.length;i++){
+					if(orderArray[i].getStatus()==2){
+						String custormerId=orderArray[i].getCustormerId();
+						int j=searchCustormerId(custormerId);
+						String custormerName=custormerArray[j].getCustormerName();
+						int qty=orderArray[i].getQuantity();
+						double tot=qty*BURGERPRICE;
+						String fs=String.format(" %-12s%-12s%-13s%-13d%10.2f",orderArray[i].getOrderId(),custormerId,custormerName,qty,tot);
+						System.out.println(fs);
+					}
+				}
+				L2:do{	
+						System.out.println();
+						System.out.print("Do you want to go to home page(Y/N) ? ");
+							char option=input.next().charAt(0);
+							if(option=='Y'||option=='y'){
+								return;
+							}else if(option=='N'||option=='n'){
+								clearConsole();
+								System.out.println("--------------------------------------------------------------------------------");
+								System.out.println("|                                View Orders                                   |");
+								System.out.println("--------------------------------------------------------------------------------");
+								System.out.println();
+								System.out.println("[1] Deliverd order");
+								System.out.println("[2] Prepairing order");
+								System.out.println("[3] Cancel order");
+								System.out.println();
+								continue L1;
+							}else{
+								System.out.print("          Wrong input...");
+								continue L2;
+							}
+					}while(true);
+			}else if(z=='2'){
+				clearConsole();
+				System.out.println("--------------------------------------------------------------------------------");
+				System.out.println("|                             Prepairig Orders                                 |");
+				System.out.println("--------------------------------------------------------------------------------");
+				System.out.println();
+				System.out.println("---------------------------------------------------------------");
+				System.out.println(" OrderId    CustormerId    Name     Quantity      OrderValue   ");
+				System.out.println("---------------------------------------------------------------");
+				for(int i=0;i<orderArray.length;i++){
+					if(orderArray[i].getStatus()==1){
+						String custormerId=orderArray[i].getCustormerId();
+						int j=searchCustormerId(custormerId);
+						String custormerName=custormerArray[j].getCustormerName();
+						int qty=orderArray[i].getQuantity();
+						double tot=qty*BURGERPRICE;
+						String fs=String.format(" %-12s%-12s%-15s%-13d%6.2f",orderArray[i].getOrderId(),custormerId,custormerName,qty,tot);
+						System.out.println(fs);
+					}
+				}
+				L2:do{
+						System.out.println();
+						System.out.print("Do you want to go to home page(Y/N) ? ");
+							char option=input.next().charAt(0);
+							if(option=='Y'||option=='y'){
+								return;
+							}else if(option=='N'||option=='n'){
+								clearConsole();
+								System.out.println("--------------------------------------------------------------------------------");
+								System.out.println("|                                View Orders                                   |");
+								System.out.println("--------------------------------------------------------------------------------");
+								System.out.println();
+								System.out.println("[1] Deliverd order");
+								System.out.println("[2] Prepairing order");
+								System.out.println("[3] Cancel order");
+								System.out.println();
+								continue L1;
+							}else{
+								System.out.print("          Wrong input...");
+								continue L2;
+							}
+					}while(true);
+			}else if(z=='3'){
+				clearConsole();
+				System.out.println("--------------------------------------------------------------------------------");
+				System.out.println("|                               Cancel Orders                                  |");
+				System.out.println("--------------------------------------------------------------------------------");
+				System.out.println();
+				System.out.println("---------------------------------------------------------------");
+				System.out.println(" OrderId    CustormerId    Name     Quantity      OrderValue   ");
+				System.out.println("---------------------------------------------------------------");
+				for(int i=0;i<orderArray.length;i++){
+					if(orderArray[i].getStatus()==0){
+						String custormerId=orderArray[i].getCustormerId();
+						int j=searchCustormerId(custormerId);
+						String custormerName=custormerArray[j].getCustormerName();
+						int qty=orderArray[i].getQuantity();
+						double tot=qty*BURGERPRICE;
+						String fs=String.format(" %-12s%-12s%-15s%-13d%6.2f",orderArray[i].getOrderId(),custormerId,custormerName,qty,tot);
+						System.out.println(fs);
+					}
+				}
+				L2:do{
+						System.out.println();
+						System.out.print("Do you want to go to home page(Y/N) ? ");
+							char option=input.next().charAt(0);
+							if(option=='Y'||option=='y'){
+								return;
+							}else if(option=='N'||option=='n'){
+								clearConsole();
+								System.out.println("--------------------------------------------------------------------------------");
+								System.out.println("|                                View Orders                                   |");
+								System.out.println("--------------------------------------------------------------------------------");
+								System.out.println();
+								System.out.println("[1] Deliverd order");
+								System.out.println("[2] Prepairing order");
+								System.out.println("[3] Cancel order");
+								System.out.println();
+								continue L1;
+							}else{
+								System.out.print("          Wrong input...");
+								continue L2;
+							}
+					}while(true);
+			}else{
+				System.out.println("Wrong input...");	
+				continue L1;
+			}
+			}while(true);
+	}
+	public static void updateOrderDetails(){
+		clearConsole();
+		Scanner input=new Scanner(System.in);
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println("|                           Update Order Details                               |");
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println();
+		L1:do{
+				System.out.print("Enter order Id - ");
+				String orderId=input.next();
+				System.out.println();
+				if(searchOrderId(orderId)==-1){
+						System.out.println("          Invalid Order Id... ");
+						L2:do{System.out.print("Do you want to add another Order Id (Y/N) ? ");
+						char option=input.next().charAt(0);
+						if(option=='Y'||option=='y'){
+							continue L1;
+						}else if(option=='N'||option=='n'){
+							return;
+						}else{
+							System.out.print("          Wrong input...");
+							continue L2;
+						}
+					}while(true);	
+				}else{
+					int i=searchOrderId(orderId);
+					if(orderArray[i].getStatus()==0){
+							System.out.println("Thi order already cancelled....You Cannot update this order..");
+							System.out.println();
+							L2:do{System.out.println("Do you want to update another order details(Y/N) : ");
+								char option=input.next().charAt(0);
+								if(option=='Y'||option=='y'){
+									continue L1;
+								}else if(option=='N'||option=='n'){
+									return;
+								}else{
+									System.out.print("          Wrong input...");
+									continue L2;
+								}
+							}while(true);
+						}else if(orderArray[i].getStatus()==2){
+							System.out.println("Thi order already dellivered....You Cannot update this order..");
+							System.out.println();
+							L2:do{System.out.println("Do you want to update another order details(Y/N) : ");
+								char option=input.next().charAt(0);
+								if(option=='Y'||option=='y'){
+									continue L1;
+								}else if(option=='N'||option=='n'){
+									return;
+								}else{
+									System.out.print("          Wrong input...");
+									continue L2;
+								}
+							}while(true);
+						}else{
+								int qty=orderArray[i].getQuantity();
+								double tot=qty*BURGERPRICE;
+								System.out.println("Order Id     : "+orderId);
+								System.out.println("Custormer Id : "+orderArray[i].getCustormerId());
+								
+								String custormerId=orderArray[i].getCustormerId();
+								int k=searchCustormerId(custormerId);
+								String custormerName=custormerArray[k].getCustormerName();
+								
+								System.out.println("Name         : "+custormerName);
+								System.out.println("Quantity     : "+qty);
+								System.out.println("Order value  : "+tot);
+								System.out.println("Order Status : Prepairing");
+								System.out.println();
+								do{
+								System.out.println("What do yo want to update ?");
+								System.out.println("          (1) Quantity");
+								System.out.println("          (2) Status");
+								System.out.println();
+								System.out.print("Enter Your Option : ");
+								char x=input.next().charAt(0);
+								if(x=='1'){
+									clearConsole();
+									System.out.println("Quantity Update");
+									System.out.println("===============");
+									System.out.println();
+									System.out.println("Order Id     : "+orderId);
+									int j=searchOrderId(orderId);
+		
+									System.out.println("Custormer Id : "+orderArray[j].getCustormerId());
+		
+									custormerId=orderArray[j].getCustormerId();
+									int m=searchCustormerId(custormerId);
+									custormerName=custormerArray[m].getCustormerName();
+								
+									System.out.println("Name         : "+custormerName);
+									L3:do{System.out.print("Enter your Quantity update value : ");
+									int nqty=input.nextInt();
+									orderArray[j].setQuantity(nqty);
+									System.out.println();
+									System.out.println("New order Quantity - "+orderArray[j].getQuantity());
+									double orderValue=	orderArray[j].getQuantity()*BURGERPRICE;
+									System.out.println("New order value    - "+orderValue);
+									System.out.println();
+									
+									L2:do{System.out.print("Do you want to update another order details(Y/N) : ");
+									char option=input.next().charAt(0);
+									if(option=='Y'||option=='y'){
+										updateOrderDetails();
+									}else if(option=='N'||option=='n'){
+										return ;
+									}else{
+										System.out.print("          Wrong input...");
+										continue L2;
+									}
+								}while(true);
+						}while(true);
+								}else if(x=='2'){
+									clearConsole();
+									System.out.println("Status Update");
+									System.out.println("=============");
+									System.out.println();
+									System.out.println("Order Id     : "+orderId);
+									int n=searchOrderId(orderId);
+		
+									System.out.println("Custormer Id : "+orderArray[n].getCustormerId());
+		
+									custormerId=orderArray[n].getCustormerId();
+									int l=searchCustormerId(custormerId);
+									custormerName=custormerArray[l].getCustormerName();
+								
+									System.out.println("Name         : "+custormerName);
+									System.out.println();
+									System.out.println("          (0) Cancel");
+									System.out.println("          (1) Prepairing");
+									System.out.println("          (2) Deliverd");
+									System.out.println();
+									L3:do{
+									System.out.print("Enter order status : ");
+									int y=input.nextInt();
+									if(y==0||y==1||y==2){
+									orderArray[n].setStatus(y);
+									}else{
+										System.out.println("          wrong input...");	
+										continue L3;
+									}
+										System.out.println();
+										L2:do{
+											System.out.print("Do you want to update another order details(Y/N) : ");
+											char option=input.next().charAt(0);
+											if(option=='Y'||option=='y'){
+											updateOrderDetails();
+											}else if(option=='N'||option=='n'){
+												return ;
+											}else{
+												System.out.print("          Wrong input...");
+												continue L2;
+											}
+										}while(true);	
+				
+									}while(true);
+	
+								}
+							}while(true);
+
+						}
+				}
+			}while(true);
+	} 
+
+		
+		
+	
+
+
+	public final static void clearConsole() {
+		try {
+			final String os = System.getProperty("os.name");
+			if (os.contains("Windows")) {
+			new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+			} else {
+			System.out.print("\033[H\033[2J");
+			System.out.flush();
+			}
+		} catch (final Exception e) {
+			e.printStackTrace();
+			// Handle any exceptions.
+	}
+}
+	public static void homePage(){
+		Scanner input=new Scanner(System.in);
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println("|                                iHungry Burger                                |");
+		System.out.println("--------------------------------------------------------------------------------");
+		System.out.println();
+		System.out.println("   [1] Add New Custormer                         [2]Place Oder");
+		System.out.println("   [3] Search Best Custormer                     [4]Search Oder");
+		System.out.println("   [5] Search Custormer                          [6]View Oders");
+		System.out.println("   [7] Update Order Details                      [8]Exit");
+		System.out.println();
+		
+		
+	}
+	
+}
